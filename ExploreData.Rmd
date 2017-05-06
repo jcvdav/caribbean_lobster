@@ -1,0 +1,40 @@
+---
+title: "Scoping lobster data"
+output: html_notebook
+---
+
+
+```{r}
+suppressPackageStartupMessages({
+  library(tidyverse)
+})
+```
+
+
+First, lets go ahead and read in the data con lobster from Costa Rica, which was found through [thiss link](https://www.incopesca.go.cr/publicaciones/estadiscticas/historico.html).
+
+```{r}
+cr_lobster <- read.csv("CostaRicaLandings_1990_2014.csv", stringsAsFactors = T, strip.white = T, sep = ",") %>% 
+  rename(Concepto = CONCEPTO) %>% 
+  gather(Month, Catch, -c(Region, Ano, Concepto))
+
+cr_lobster
+```
+
+```{r}
+group_by(cr_lobster, Region, Ano, Concepto) %>% 
+  filter(Region %in% c("Caribe", "Limon")) %>% 
+  filter(Concepto %in% c("LANG CARIBE", "LANGOSTA CARIBE")) %>% 
+  summarize(Catch = sum(Catch, na.rm =T)/1000) %>% 
+  ggplot(aes(x = Ano, y = Catch)) +
+  geom_smooth(method = "loess", alpha = 0.5) +
+  geom_point(aes(shape = Region), size = 2) +
+  theme_bw()
+
+```
+
+
+```{r}
+
+```
+
